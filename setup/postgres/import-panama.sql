@@ -1,0 +1,63 @@
+CREATE TABLE panama_import
+(
+    _id                      varchar,
+    _labels                  varchar,
+    address                  varchar,
+    closed_date              varchar,
+    company_type             varchar,
+    countries                varchar,
+    country_codes            varchar,
+    ibcRUC                   varchar,
+    inactivation_date        varchar,
+    incorporation_date       varchar,
+    jurisdiction             varchar,
+    jurisdiction_description varchar,
+    name                     varchar,
+    node_id                  varchar,
+    note                     varchar,
+    service_provider         varchar,
+    sourceID                 varchar,
+    status                   varchar,
+    struck_off_date          varchar,
+    valid_until              varchar,
+    edge_start               varchar,
+    edge_end                 varchar,
+    edge_type                varchar,
+    edge_end_date            varchar,
+    edge_sourceID            varchar,
+    edge_start_date          varchar,
+    edge_valid_until         varchar
+);
+
+COPY panama_import(
+    _id,
+    _labels,
+    address,
+    closed_date,
+    company_type,
+    countries,
+    country_codes,
+    ibcRUC,
+    inactivation_date,
+    incorporation_date,
+    jurisdiction,
+    jurisdiction_description,
+    name,
+    node_id,
+    note,
+    service_provider,
+    sourceID,
+    status,
+    struck_off_date,
+    valid_until,
+    edge_start ,
+    edge_end ,
+    edge_type ,
+    edge_end_date ,
+    edge_sourceID ,
+    edge_start_date ,
+    edge_valid_until
+    )
+    FROM '/panama.csv'
+    DELIMITER ','
+    CSV HEADER;
