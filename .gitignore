@@ -1,3 +1,12 @@
+# KDE
+.directory
+
+# Data
 setup/neo4j-init/icij-panama-papers-35.dump
 setup/neo4j-init/panama.csv
-.directory
+
+# Latex
+*.aux
+*.log
+*.toc
+*.synctex.gz
