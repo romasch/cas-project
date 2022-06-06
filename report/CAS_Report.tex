@@ -92,13 +92,31 @@
 \chapter{Introduction} \label{chp:introduction}
 %=====================================================================
 
+Over many years the default for data storage was a relational database, and it still is today. 
+However, in recent years the NoSQL Movement has gained traction.
+NoSQL is actually an umbrella term for many different technologies.
+Among them are graph databases.
+Graph database optimize graph traversal and path finding and other stuff.
+In this report, we want to look at a specific graph database Neo4j and compare it to Postgres, a popular free relational DB.
 
+[TODO maybe also tell why neo4j might be used in our company]
 
 %=====================================================================
 \chapter{Database comparison (neo4j vs postgres)} \label{chp:theory}
 %=====================================================================
 
+On the relational side we have Postgres, a very classical relational database.
+The underlying theory is relational algebra [link to paper].
+Data is stored in tables with a strict schema.
+The data can be queried using SQL.
 
+Neo4j is a free graph database with commercial support.
+Internally all data is stored as a labelled property graph.
+Meaning there are nodes with properties, as well as edges with properties.
+Internally, neo4j uses the index-free adjacency technique, a storage technique which allows to traverse a graph without looking up nodes in an index.
+This is in contrast to relational database where foreign key relations have to be resolved by loading the specific entry from another table through an index.
+The data in neo4j is queried through Cypher query language, an SQL like language specifically desigend for graphs.
+It allows to match agains graph relations with the --> operator.
 
 %=====================================================================
 \chapter{Methods} \label{chp:methods}
@@ -109,23 +127,61 @@
 \section{The ICIJ offshoreleaks data set} \label{sec:dataset}
 %---------------------------------------------------------------------
 
+The data used for the comparison is from the ICIJ offshoreleaks [link].
+The consortium provides the database as a dump, and thus it can be directly imported to neo4j.
+
+For postgres we use the export as CSV function.
+This returns the data as one big table, which we can import using the postgres `COPY` statement to a temporary table.
+Since nodes and edges are mixed using this technique, we further copy the data along with the relevant properties into a `node` and an `edge` table.
+There are no further tables based on type because we want the flexibility of traversing the graph regardless of labels.
+(On production systems we may want to have different tables per label or relationship type).
 
 %---------------------------------------------------------------------
-\section{Benchmark Queries} \label{sec:benchmark}
+\section{Queries} \label{sec:benchmark}
 %---------------------------------------------------------------------
+
+There are three queries for the comparison. Note that queries focus a lot on graph traversal and give an advantage to neo4j. 
+This is kind of fine, because we consider a scenario where a graph database is used in addition to a relational database.
+
+
+
+
+\subsection{Same Address and Firm}
+
+We want to find two different officers for the same firm who live at the same address, e.g. to find family relations.
+This targets the subgraph matching [link?] aspect of graph databases.
+
+\includegraphics*[width=0.5\textwidth]{figures/query_relation.png} \hfill
+
+\subsection{Shortest Path}
+
+Find the shortest path between two nodes, if they are connected at all. E.g. to find out if Marc Rich (former founder of Glencore and always a bit in trouble with the law) still has connections to the Glencore group.
+
+\includegraphics*[width=0.5\textwidth]{figures/query_shortest_path.png} \hfill
+
+\subsection{Transitive Query}
+
+Transitively find all nodes reachable from a start node, maybe up to some level X. E.g. find all entities that are directed by the king of Saudi Arabia [TODO: maybe find a better example]
+
+\includegraphics*[width=0.5\textwidth]{figures/query_transitive.png} \hfill
 
 %=====================================================================
 \chapter{Results} \label{chp:results}
 %=====================================================================
 
 
+
 %---------------------------------------------------------------------
 \section{Performance} \label{sec:performance}
 %---------------------------------------------------------------------
 
+
+
 %---------------------------------------------------------------------
 \section{Ease of use} \label{sec:convenience}
 %---------------------------------------------------------------------
+
+
 
 
 %=====================================================================
