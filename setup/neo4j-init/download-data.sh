@@ -1,1 +1,1 @@
-wget https://github.com/neo4j-graph-examples/icij-panama-papers/raw/main/data/icij-panama-papers-35.dump 
+wget -O neo4j.dump https://github.com/ICIJ/offshoreleaks-data-packages/raw/main/data/icij-offshoreleaks-44.dump

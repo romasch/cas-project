@@ -2,8 +2,8 @@
 .directory
 
 # Data
-setup/neo4j-init/icij-panama-papers-35.dump
-setup/neo4j-init/panama.csv
+setup/neo4j-init/*.dump
+setup/neo4j-init/*.csv
 
 # Latex
 *.aux
