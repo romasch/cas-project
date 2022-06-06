@@ -28,12 +28,3 @@ select import.edge_start :: int,
        import.edge_type
 from offshoreleaks_import import
 where import.edge_start is not null;
-
-create materialized view edge_mirrored as
-select distinct *
-from (
-         select node_start, node_end
-         from edge
-         union
-         select node_end, node_start
-         from edge) combined
