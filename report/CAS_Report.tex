@@ -144,9 +144,7 @@ There are three queries for the comparison. Note that queries focus a lot on gra
 This is kind of fine, because we consider a scenario where a graph database is used in addition to a relational database.
 
 
-
-
-\subsection{Same Address and Firm}
+\subsection{Subgraph Matching}
 
 We want to find two different officers for the same firm who live at the same address, e.g. to find family relations.
 This targets the subgraph matching [link?] aspect of graph databases.
@@ -165,32 +163,79 @@ Transitively find all nodes reachable from a start node, maybe up to some level 
 
 \includegraphics*[width=0.5\textwidth]{figures/query_transitive.png} \hfill
 
+
+%---------------------------------------------------------------------
+\section{Measurements} \label{sec:measurements}
+%---------------------------------------------------------------------
+
+We measure response time of a query
+Average over 100 exeuctions (with different input?)
+Postgres, neo4j in Docker Container. Maybe include hardware specs
+
 %=====================================================================
 \chapter{Results} \label{chp:results}
 %=====================================================================
-
-
-
-%---------------------------------------------------------------------
-\section{Performance} \label{sec:performance}
-%---------------------------------------------------------------------
-
 
 
 %---------------------------------------------------------------------
 \section{Ease of use} \label{sec:convenience}
 %---------------------------------------------------------------------
 
+Shown here is a side by side comparison of query complexity:
+
+TODO: add listings, maybe measure complexity somehow (num characters, num operators)?
+
+Subgraph matching can be done with lots of joins.
+Inconvenient, but possible.
+
+There is no direct support for shortest path. 
+We need to implement a BFS and stop when target node found.
+
+The easy switch from directed to undirected path in neo4j is very powerful, needs a lot more fiddling around in Postgres.
+
+Transitive queries are very similar in Postgres to the shortest path. In a way we actually calculate the 
+
+%---------------------------------------------------------------------
+\section{Performance} \label{sec:performance}
+%---------------------------------------------------------------------
+
+The result of the query performance is shown below:
+
+\begin{center}
+\begin{tabular}{ |c|c c| }
+\hline
+  & neo4j & postgres \\ 
+  \hline
+ Subgraph Matching& avg +- standard deviation & TODO \\  
+ Shortest Path & cell5 & cell6 \\  
+ Transitive Query & cell8 & cell9     \\
+\hline
+ \end{tabular}
+\end{center}
 
 
+There were also some problems in Shortest Path to make it even remotely usable, e.g. Postgres materializes the with query (https://www.postgresql.org/docs/current/queries-with.html). Any where clause therefore needs to be pushed into the recursive query.
+Another problem is that the intermediate result set gets too big if the distinct clause is not present (doubly calculated work).
 
 %=====================================================================
 \chapter{Discussion} \label{chp:discussion}
 %=====================================================================
 
+The result heavily favors neo4j, but this is expected since we chose queries where a graph DB is traditionally strong.
+However, the result also shows that it is possible to use a relational database.
+Whether to use neo4j or not (in addition to a relational DB) therefore very much depends on the requirements.
+If there are many queries for subgraph matching or transitive graph traversal are required, the query improvements might outweigh the additional complexity and potential data duplication of having two database systems.
+
 %=====================================================================
 \chapter{Conclusion and future work} \label{chp:conclusion}
 %=====================================================================
+
+In this report we have analyzed three queries in neo4j and postgres and compared their execution performance and query complexity. 
+Due to the design of the study, the result favors neo4j, but it depends on the requirements if neo4j should be used.
+Note that this study does not try to answer the question if neo4j can be used instead of postgres, only if it can be used in addition to postgres. The former was never a goal.
+
+We believe this resolves all remaining questions on this topic. No further research is needed. [https://xkcd.com/2268/]
+
 
 \bibliographystyle{alpha}
 \bibliography{references}
