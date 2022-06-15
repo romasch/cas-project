@@ -3,11 +3,11 @@
 ## Data Import
 
 * Download dump file with `./neo4j-init/download-data.sh`
-* `$ docker-compose up neo4j -d`
+* `$ docker-compose up neo4j`
 * Extract CSV file:
     * Open http://localhost:7474/browser/ and log in without authentication
     * Execute `CALL apoc.export.csv.all("panama.csv", {})`
-    * `$ docker exec -it setup-neo4j-1 cp /var/lib/neo4j/import/panama.csv /neo4j-init/panama.csv`
+    * `$ docker exec -it setup_neo4j_1 cp /var/lib/neo4j/import/panama.csv /neo4j-init/panama.csv`
 * Start Postgres: `$ docker-compose up postgres -d`
 
 ## Intellij Setup

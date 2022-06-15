@@ -10,4 +10,4 @@ https://offshoreleaks.icij.org/pages/database
 * https://github.com/neo4j-graph-examples/icij-panama-papers
     * evtl. noch ersetzen mit https://github.com/neo4j-graph-examples/icij-offshoreleaks
 * CSV Export: https://neo4j.com/labs/apoc/4.1/export/csv/
-*
+* https://arxiv.org/pdf/2001.02299v4.pdf
