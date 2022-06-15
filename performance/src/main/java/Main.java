@@ -27,6 +27,20 @@ public class Main {
         print("neo4j | subgraph", names().limit(10).map(n -> cypherQuery(CypherQueries.familyRelations())));
         // TODO: why does this fail only with JDBC driver?!
 //        print("postgres | subgraph", names().map(n -> postgresQuery(PostgresQueries.familyRelations())));
+
+        var manualMeasurements = Stream.of(
+                28.137,
+                28.060,
+                27.715,
+                28.348,
+                28.282,
+                28.280,
+                28.138,
+                28.152,
+                28.291,
+                28.335
+        ).map(i -> i * 1_000_000_000);
+        print("postgres | subgraph (manual)", manualMeasurements);
     }
 
     private static Stream<String> names() {
