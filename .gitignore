@@ -5,6 +5,10 @@
 setup/neo4j-init/*.dump
 setup/neo4j-init/*.csv
 
+# Gradle
+**/build/
+**/.gradle/
+
 # Latex
 *.aux
 *.log
