@@ -1,6 +1,6 @@
 // point query
 MATCH (o:Officer)
-  WHERE o.name CONTAINS 'Fishman'
+  WHERE o.name = 'Fishman - Marcos Shulim'
 RETURN o;
 
 // one-hop

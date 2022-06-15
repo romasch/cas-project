@@ -1,0 +1,10 @@
+Measurement 2022-06-15 15:49
+neo4j | point: 0.043604s +- 0.021641s (100 measurements)
+postgres | point: 0.043645s +- 0.001029s (100 measurements)
+neo4j | 1-hop: 0.038591s +- 0.015960s (100 measurements)
+postgres | 1-hop: 0.121463s +- 0.005704s (100 measurements)
+neo4j | 2-hop: 0.037369s +- 0.017822s (100 measurements)
+postgres | 2-hop: 0.275315s +- 0.007568s (100 measurements)
+neo4j | shortest-path: 2.531583s +- 0.034940s (10 measurements)
+postgres | shortest-path: 16.413803s +- 0.238791s (10 measurements)
+neo4j | subgraph: 5.521744s +- 0.155010s (10 measurements)

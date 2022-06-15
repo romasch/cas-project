@@ -5,7 +5,8 @@
 
 select *
 from node
-where name like '%Fishman%';
+where name = 'Fishman - Marcos Shulim'
+  and labels = ':Officer';
 
 -- one-hop
 -- MATCH (o:Officer)-->(a)
@@ -16,7 +17,8 @@ select *
 from node a
          join edge ab on a.id = ab.node_start
          join node b on ab.node_end = b.id
-where a.name = 'Fishman - Marcos Shulim';
+where a.name = 'Fishman - Marcos Shulim'
+  and a.labels = ':Officer';
 
 -- two-hop
 -- MATCH (o:Officer)-->(a) -->(b)
@@ -29,7 +31,8 @@ from node a
          join node b on ab.node_end = b.id
          join edge bc on b.id = bc.node_start
          join node c on bc.node_end = c.id
-where a.name = 'Fishman - Marcos Shulim';
+where a.name = 'Fishman - Marcos Shulim'
+  and a.labels = ':Officer';
 
 -- MATCH(a:Officer)-[:officer_of]->(entity:Entity) <-[:officer_of]-(b:Officer),
 --      (a)-->(address:Address) <--(b)
@@ -114,3 +117,14 @@ select *
 from node source
          join path p on (source.id = p.p_start)
          join node target on (p.p_end = target.id);
+
+
+-- Select "interesting" names
+select n.name
+from node n
+         tablesample system (0.25)
+         join edge e on n.id = e.node_start
+where n.labels = ':Officer'
+group by n.name
+having count(e.node_end) > 5
+limit 100
