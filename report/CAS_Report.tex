@@ -199,19 +199,24 @@ Transitive queries are very similar in Postgres to the shortest path. In a way w
 \section{Performance} \label{sec:performance}
 %---------------------------------------------------------------------
 
-The result of the query performance is shown below:
+The result of the query performance is shown in table \ref{table:performance}:
 
-\begin{center}
-\begin{tabular}{ |c|c c| }
-\hline
-  & neo4j & postgres \\ 
-  \hline
- Subgraph Matching& avg +- standard deviation & TODO \\  
- Shortest Path & cell5 & cell6 \\  
- Transitive Query & cell8 & cell9     \\
-\hline
- \end{tabular}
-\end{center}
+\begin{table}
+	\begin{center}
+		\begin{tabular}{ |l|c|c|c| }
+			\hline
+			& queries & neo4j & postgres \\
+			\hline
+			Point Query & 100 & 0.043604s $\pm$ 0.021641s & 0.043645s $\pm$ 0.001029s \\
+			One-Hop & 100 & 0.038591s $\pm$ 0.015960s & 0.121463s $\pm$ 0.005704s \\
+			Two-Hop & 100 & 0.037369s $\pm$ 0.017822s & 0.275315s $\pm$ 0.007568s \\
+			Shortest Path & 10& 2.531583s $\pm$ 0.034940s & 16.413803s $\pm$ 0.238791s \\
+			Subgraph Matching & 10 & 5.521744s $\pm$ 0.155010s & 28.173800s $\pm$ 0.178777s \\
+			\hline
+		\end{tabular}
+		\caption{\label{table:performance} Meaurement results (average $\pm$ standard deviation).}
+	\end{center}
+\end{table}
 
 
 There were also some problems in Shortest Path to make it even remotely usable, e.g. Postgres materializes the with query (https://www.postgresql.org/docs/current/queries-with.html). Any where clause therefore needs to be pushed into the recursive query.
