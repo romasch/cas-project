@@ -1,16 +1,11 @@
-\begin{thebibliography}{GSSP10}
+\begin{thebibliography}{PZLO17}
 
-\bibitem[GSSP10]{GSSP:10}
-Prashant Goswami, Philipp Schlegel, Barbara Solenthaler, and Renato Pajarola.
-\newblock Interactive {SPH} simulation and rendering on the {GPU}.
-\newblock In {\em Proceedings ACM SIGGRAPH/Eurographics Symposium on Computer
-  Animation}, pages 55--64, 2010.
-
-\bibitem[Paj07]{Pajarola:07}
-Renato Pajarola.
-\newblock Efficient data structures.
-\newblock In Markus~H. Gross and Hanspeter Pfister, editors, {\em Point-Based
-  Graphics}, Series in Computer Graphics, pages 148--165. Morgan Kaufmann
-  Publishers, 2007.
+\bibitem[PZLO17]{graphdbbenchmark}
+Anil Pacaci, Alice Zhou, Jimmy Lin, and M.~Tamer \"{O}zsu.
+\newblock Do we need specialized graph databases? benchmarking real-time social
+  networking applications.
+\newblock In {\em Proceedings of the Fifth International Workshop on Graph
+  Data-Management Experiences \& Systems}, GRADES'17, New York, NY, USA, 2017.
+  Association for Computing Machinery.
 
 \end{thebibliography}

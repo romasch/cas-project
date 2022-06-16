@@ -1,0 +1,14 @@
+-- Cypher
+match (o:Officer)-->(a) -->(b)
+  where o.name = 'Fishman - Marcos Shulim'
+return o, a, b;
+
+-- Postgres
+select *
+from node a
+         join edge ab on a.id = ab.node_start
+         join node b on ab.node_end = b.id
+         join edge bc on b.id = bc.node_start
+         join node c on bc.node_end = c.id
+where a.name = 'Fishman - Marcos Shulim'
+  and a.labels = ':Officer';

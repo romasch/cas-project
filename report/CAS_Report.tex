@@ -140,9 +140,31 @@ There are no further tables based on type because we want the flexibility of tra
 \section{Queries} \label{sec:benchmark}
 %---------------------------------------------------------------------
 
-There are three queries for the comparison. Note that queries focus a lot on graph traversal and give an advantage to neo4j. 
+For our comparison we select four queries as in \cite{graphdbbenchmark}.
+They used a simple point query to fetch just a single result, a one-hop and two-hop query to traverse along one or two edges respectively, and a shortest path query.
+Additionally, we add a sligthly more complex query to match a subgraph pattern.
+Note that queries focus a lot on graph traversal and give an advantage to neo4j.
 This is kind of fine, because we consider a scenario where a graph database is used in addition to a relational database.
 
+\subsection{Point Query}
+
+The point query is a very simple lookup by name.
+There is no edge traversal necessary and therefore no joins as well in the relational database.
+
+\subsection{One-Hop Query}
+
+This query will search for a specific node and return this node as well as all directly adjacent nodes.
+
+\subsection{Two-Hop Query}
+
+Similar to the one-hop query, but we go one step further and return the neighbours of neighbours.
+It is not a fully transitive fetch, we stop at depth two.
+
+\subsection{Shortest Path}
+
+Find the shortest path between two nodes, if they are connected at all. E.g. to find out if Marc Rich (former founder of Glencore and always a bit in trouble with the law) still has connections to the Glencore group.
+
+\includegraphics*[width=0.5\textwidth]{figures/query_shortest_path.png} \hfill
 
 \subsection{Subgraph Matching}
 
@@ -151,49 +173,28 @@ This targets the subgraph matching [link?] aspect of graph databases.
 
 \includegraphics*[width=0.5\textwidth]{figures/query_relation.png} \hfill
 
-\subsection{Shortest Path}
 
-Find the shortest path between two nodes, if they are connected at all. E.g. to find out if Marc Rich (former founder of Glencore and always a bit in trouble with the law) still has connections to the Glencore group.
-
-\includegraphics*[width=0.5\textwidth]{figures/query_shortest_path.png} \hfill
-
-\subsection{Transitive Query}
-
-Transitively find all nodes reachable from a start node, maybe up to some level X. E.g. find all entities that are directed by the king of Saudi Arabia [TODO: maybe find a better example]
-
-\includegraphics*[width=0.5\textwidth]{figures/query_transitive.png} \hfill
+% \subsection{Transitive Query}
+%
+% Transitively find all nodes reachable from a start node, maybe up to some level X. E.g. find all entities that are directed by the king of Saudi Arabia [TODO: maybe find a better example]
+%
+% \includegraphics*[width=0.5\textwidth]{figures/query_transitive.png} \hfill
 
 
 %---------------------------------------------------------------------
 \section{Measurements} \label{sec:measurements}
 %---------------------------------------------------------------------
 
-We measure response time of a query
-Average over 100 exeuctions (with different input?)
-Postgres, neo4j in Docker Container. Maybe include hardware specs
+For performance measurements, we repeat a sample queries a number of times and measure average response time and standard deviation.
+The simple queries are repeated 100 times.
+The input for these queries varies each time with a different node to look for.
+The shortest path and subgraph matching was repeated only 10 times with fixed input.
+The measurement was done with Neo4J 4.4 and Postgres 14.3, each running in a Docker container.
+The host system has an Intel Core i9-9900K CPU with 3.60GHz and 64GB RAM.
 
 %=====================================================================
 \chapter{Results} \label{chp:results}
 %=====================================================================
-
-
-%---------------------------------------------------------------------
-\section{Ease of use} \label{sec:convenience}
-%---------------------------------------------------------------------
-
-Shown here is a side by side comparison of query complexity:
-
-TODO: add listings, maybe measure complexity somehow (num characters, num operators)?
-
-Subgraph matching can be done with lots of joins.
-Inconvenient, but possible.
-
-There is no direct support for shortest path. 
-We need to implement a BFS and stop when target node found.
-
-The easy switch from directed to undirected path in neo4j is very powerful, needs a lot more fiddling around in Postgres.
-
-Transitive queries are very similar in Postgres to the shortest path. In a way we actually calculate the 
 
 %---------------------------------------------------------------------
 \section{Performance} \label{sec:performance}
@@ -218,9 +219,32 @@ The result of the query performance is shown in table \ref{table:performance}:
 	\end{center}
 \end{table}
 
+Generally, Cypher outperforms Postgres by a factor 3 to 7 in all but the simple point query.
 
 There were also some problems in Shortest Path to make it even remotely usable, e.g. Postgres materializes the with query (https://www.postgresql.org/docs/current/queries-with.html). Any where clause therefore needs to be pushed into the recursive query.
 Another problem is that the intermediate result set gets too big if the distinct clause is not present (doubly calculated work).
+
+%---------------------------------------------------------------------
+\section{Ease of use} \label{sec:convenience}
+%---------------------------------------------------------------------
+
+Neo4j has a graph traversal operator $\rightarrow$ which can be used to search adjacent nodes.
+This is a very powerful tool, as every such graph traversal needs to be modeled as two joins in the relational model.
+The effect of this can be seen very nicely in the two-hop query, which requires four joins in Postgres:
+
+\lstinputlisting[language=SQL,label=two-hop-query]{pseudocode/two-hop.txt}
+
+Another very useful, although somewhat situational query mechanism is the shortest\_path funciton in Cypher.
+It can be used to find connections between two nodes very easily and efficiently.
+In Postgres we have to implement a kind of breadth-first search with a recursive common table expression and stop when the target node has been found.
+
+\lstinputlisting[language=SQL,label=shortest-path-query]{pseudocode/shortest-path.txt}
+
+This example also shows how Cypher can easily ignore the directionality of edges
+if we do not specify the arrowhead in the $\rightarrow$ operator.
+To achieve the same behavior in Postgres we need to first calculate the union of the regular and reversed 'edge' table.
+
+TODO: maybe measure complexity somehow (num characters, num operators)?
 
 %=====================================================================
 \chapter{Discussion} \label{chp:discussion}

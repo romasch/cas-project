@@ -1,0 +1,38 @@
+-- Cypher
+match
+  (a {name: 'Glencore Group'}),
+  (b {name: 'Marc Rich Real Estate GmbH'}),
+  p = shortestPath((a)-[*..10]-(b))
+return p;
+
+--Postgres
+with recursive
+    edge_both(node_start, node_end) as (
+        select distinct *
+        from (select node_start, node_end
+              from edge
+              union
+              select node_end, node_start
+              from edge) combined),
+
+    path(p_start, p_end, distance, nodes) as (
+        select e.node_start, node_end, 1, array [node_start, node_end]
+        from edge_both e
+        where e.node_start = (select id from node where name = 'Glencore Group')
+        union all
+        select distinct on (path.p_start,e.node_end) path.p_start,
+                                                     e.node_end,
+                                                     path.distance + 1,
+                                                     path.nodes || e.node_end
+        from path
+                 join edge_both e on path.p_end = e.node_start
+        where e.node_end != any (path.nodes)
+          and path.distance < 10
+    )
+select *
+from node source
+         join path p on (source.id = p.p_start)
+         join node target on (p.p_end = target.id)
+where target.name = 'Marc Rich Real Estate GmbH'
+order by distance
+limit 1;
