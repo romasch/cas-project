@@ -1,0 +1,27 @@
+-- Cypher
+MATCH
+    (a:Officer) -[:officer_of]-> (entity:Entity) <-[:officer_of]- (b:Officer),
+    (a) --> (address:Address) <-- (b)
+RETURN a, b, entity, address
+  LIMIT 20
+
+-- SQL
+select a.*,
+       b.*,
+       entity.*,
+       address.*
+from node a
+         join edge e1 on a.id = e1.node_start
+         join node entity on e1.node_end = entity.id
+         join edge e2 on e2.node_end = entity.id
+         join node b on e2.node_start = b.id
+         join edge address_a on (address_a.node_start = a.id)
+         join node address on address_a.node_end = address.id
+         join edge address_b on (address_b.node_start = b.id and address_b.node_end = address.id)
+where a.labels = ':Officer'
+  and b.labels = ':Officer'
+  and entity.labels = ':Entity'
+  and e1.type = 'officer_of'
+  and e2.type = 'officer_of'
+  and address.labels = ':Address'
+limit 20;

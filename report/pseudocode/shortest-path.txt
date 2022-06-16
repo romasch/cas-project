@@ -5,7 +5,7 @@ match
   p = shortestPath((a)-[*..10]-(b))
 return p;
 
---Postgres
+-- SQL
 with recursive
     edge_both(node_start, node_end) as (
         select distinct *

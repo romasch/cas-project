@@ -3,7 +3,7 @@ match (o:Officer)-->(a) -->(b)
   where o.name = 'Fishman - Marcos Shulim'
 return o, a, b;
 
--- Postgres
+-- SQL
 select *
 from node a
          join edge ab on a.id = ab.node_start
