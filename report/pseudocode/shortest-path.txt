@@ -34,5 +34,4 @@ from node source
          join path p on (source.id = p.p_start)
          join node target on (p.p_end = target.id)
 where target.name = 'Marc Rich Real Estate GmbH'
-order by distance
-limit 1;
+order by distance limit 1;

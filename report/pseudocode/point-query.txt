@@ -1,0 +1,10 @@
+-- Cypher
+match (o:Officer)
+  where o.name = 'Fishman - Marcos Shulim'
+return o;
+
+-- SQL
+select *
+from node
+where name = 'Fishman - Marcos Shulim'
+  and labels = ':Officer';

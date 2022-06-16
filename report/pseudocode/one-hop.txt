@@ -1,0 +1,12 @@
+-- Cypher
+match (o:Officer)-->(a)
+  where o.name = 'Fishman - Marcos Shulim'
+return o, a;
+
+-- SQL
+select *
+from node a
+         join edge ab on a.id = ab.node_start
+         join node b on ab.node_end = b.id
+where a.name = 'Fishman - Marcos Shulim'
+  and a.labels = ':Officer';
