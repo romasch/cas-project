@@ -1,5 +1,11 @@
 \begin{thebibliography}{PZLO17}
 
+\bibitem[Mun]{xkcdresearch}
+Randall Munroe.
+\newblock Further research is needed.
+\newblock https://xkcd.com/2268/.
+\newblock Accessed: 2022-06-16.
+
 \bibitem[PZLO17]{graphdbbenchmark}
 Anil Pacaci, Alice Zhou, Jimmy Lin, and M.~Tamer \"{O}zsu.
 \newblock Do we need specialized graph databases? benchmarking real-time social

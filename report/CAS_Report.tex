@@ -92,31 +92,46 @@
 \chapter{Introduction} \label{chp:introduction}
 %=====================================================================
 
-Over many years the default for data storage was a relational database, and it still is today. 
-However, in recent years the NoSQL Movement has gained traction.
-NoSQL is actually an umbrella term for many different technologies.
-Among them are graph databases.
-Graph database optimize graph traversal and path finding and other stuff.
-In this report, we want to look at a specific graph database Neo4j and compare it to Postgres, a popular free relational DB.
+Relational databases have been around for many years now and form a cornerstone of most modern IT applications.
+In recent years however, NoSQL databases have gained more widespread use.
+NoSQL databases renounce the table model and the underlying relational algebra of traditional database systems and instead provide alternative data storage solutions, each specialized to a specific task.
 
-[TODO maybe also tell why neo4j might be used in our company]
+Graph databases are one such type of NoSQL databases.
+They internally model all data as a graph, and as such are optimized towards graph traversal, path finding and visualizing relationships within graph structures.
+
+As such, a graph database might be an ideal addition for the software project that we are working on at Ergon Informatik AG.
+In this project we build a dossier management system for public prosecutors and the police.
+A graph database could for example be used to visualize relations between different persons or to track the various paths that money has been paid to during a money laundering scheme.
+
+In this report we will therefore try to compare and find advantages of a graph database against relational databases.
+We will pick PostgreSQL as a relational database, because it is a popular database that is already in use within our project.
+For the graph database, we will use Neo4j - mostly because there are datasets readily available for our analysis.
+As we already use PostgreSQL in our project, the goal of this analysis is not to decide whether to use one database system or the other, but rather to find out whether it is worthwile to add Neo4j in addition to PostgreSQL.
+Therefore, all of the queries we analyze specifically target a scenario where the underlying model is already a graph, as we would otherwise simply use the already present PostgreSQL database.
 
 %=====================================================================
-\chapter{Database comparison (neo4j vs postgres)} \label{chp:theory}
+\chapter{Database Systems} \label{chp:theory}
 %=====================================================================
 
-On the relational side we have Postgres, a very classical relational database.
-The underlying theory is relational algebra [link to paper].
-Data is stored in tables with a strict schema.
-The data can be queried using SQL.
+\section{PostgreSQL}
+PostgreSQL \cite{postgres} is an open source that has been in development since 1996.
+Its theoretical foundation is relational algebra \cite{relationalalgebra} and therefore represents a typical relational database system.
+Data is stored in multiple tables which can reference each other by foreign key relations.
+As opposed to most NoSQL solutions, there is a strict schema that data needs to conform to.
+The data can be queried using the SQL query language.
 
-Neo4j is a free graph database with commercial support.
-Internally all data is stored as a labelled property graph.
-Meaning there are nodes with properties, as well as edges with properties.
-Internally, neo4j uses the index-free adjacency technique, a storage technique which allows to traverse a graph without looking up nodes in an index.
-This is in contrast to relational database where foreign key relations have to be resolved by loading the specific entry from another table through an index.
+\section{Neo4j}
+Neo4j \cite{neo4j} is an open source graph database system with commercial support.
+It has been in development since 2007.
+As a graph database, Neo4j stores all its data as a labelled property graph - a graph composed of nodes and edges which both can have an arbitrary number of named properties.
+Additionally, both nodes and edges can have a type (or label) which can be used to classify nodes and impose a semi-structured schema on the node regarding its properties.
+
+For efficient graph traversal, Neo4j uses index-free adjacency internally \cite{neo4jinaction:chapter11}.
+Index-free adjacency is a graph storage technique which allows to follow along graph edges simply by looking up a pointer in memory.
+This is different from a relational database where a foreign key relation needs to be resolved by looking up the physical address of another entry via a database index and then loading the corresponding page table entry to memory in a second step.
+
 The data in neo4j is queried through Cypher query language, an SQL like language specifically desigend for graphs.
-It allows to match agains graph relations with the --> operator.
+One of the main features of Cypher is the $(a)\rightarrow(b)$ operator, which is used to match two nodes a and b connected by an edge.
 
 %=====================================================================
 \chapter{Methods} \label{chp:methods}
@@ -127,51 +142,71 @@ It allows to match agains graph relations with the --> operator.
 \section{The ICIJ offshoreleaks data set} \label{sec:dataset}
 %---------------------------------------------------------------------
 
-The data used for the comparison is from the ICIJ offshoreleaks [link].
-The consortium provides the database as a dump, and thus it can be directly imported to neo4j.
+The dataset used for the comparison is from the ICIJ offshore leaks \cite{offshoreleaks}.
+The ICIJ consortium provides the database as a dump file, and thus it can be directly imported to Neo4j.
+The dataset is basically a huge graph which shows connections between letterbox companies (Entities) with their addresses, their board of owners and directors (Officers) as well as any intermediaries that provide legal services. In total the graph contains about  1.97 million nodes and 3.27 million edges.
 
-For postgres we use the export as CSV function.
-This returns the data as one big table, which we can import using the postgres `COPY` statement to a temporary table.
-Since nodes and edges are mixed using this technique, we further copy the data along with the relevant properties into a `node` and an `edge` table.
-There are no further tables based on type because we want the flexibility of traversing the graph regardless of labels.
-(On production systems we may want to have different tables per label or relationship type).
+To get the same dataset into Postgres we used the ``Export as CSV'' function in Neo4J and then imported the resulting file into a temporary Postgres table using the \lstinline{COPY} statement.
+As nodes and edges are mixed into a single table using this technique, we further copy the data into a \lstinline{node} and an \lstinline{edge} table with proper foreign key relations in between.
+The type and labelled properties of the graph are mapped to individual columns in the database table.
+
+Although it is possible to further partition the \lstinline{node} and \lstinline{edge} tables based on their labels, we decided against it to keep the flexibility of traversing the whole graph in SQL.
 
 %---------------------------------------------------------------------
 \section{Queries} \label{sec:benchmark}
 %---------------------------------------------------------------------
 
 For our comparison we select four queries as in \cite{graphdbbenchmark}.
-They used a simple point query to fetch just a single result, a one-hop and two-hop query to traverse along one or two edges respectively, and a shortest path query.
-Additionally, we add a sligthly more complex query to match a subgraph pattern.
-Note that queries focus a lot on graph traversal and give an advantage to neo4j.
-This is kind of fine, because we consider a scenario where a graph database is used in addition to a relational database.
+In their paper they analyzed a simple point query to fetch just a single result, a one-hop and two-hop query to traverse along one or two edges respectively, and a shortest path query.
+In addition to that we also add a slightly more complex query which is aimed towards finding a subgraph pattern within the whole graph.
+
+Please note that - with the exception of the point query - all of our queries require some kind of graph traversal.
+This kind of study design of course heavily works in favor of Neo4j.
+But as we already mentioned, the idea is to identify scenarios where a graph database is vastly superior to a relational database such that the integration of a second database management system might be justified.
 
 \subsection{Point Query}
 
-The point query is a very simple lookup by name.
-There is no edge traversal necessary and therefore no joins as well in the relational database.
+The point query is just a simple lookup of a graph node by its name property.
+There should be no edge traversal necessary and therefore also no join in a relational database.
 
 \subsection{One-Hop Query}
 
-This query will search for a specific node and return this node as well as all directly adjacent nodes.
+The one-hop query will search for a specific node by its name with any neighbors. It should return the found node, as well as all directly adjacent nodes.
+
+\begin{center}
+\includegraphics*[width=0.5\textwidth]{figures/query-one-hop.png}
+\end{center}
+
+
 
 \subsection{Two-Hop Query}
 
-Similar to the one-hop query, but we go one step further and return the neighbours of neighbours.
-It is not a fully transitive fetch, we stop at depth two.
+The two-hop query is similar to the one-hop query, but it will also look for ``neighbors of neighbors'' of the start node and return them. It is not a fully transitive fetch operation, because the query will only look at adjacent nodes up to a level of two.
+
+\begin{center}
+\includegraphics*[width=0.5\textwidth]{figures/query-two-hop.png}
+\end{center}
 
 \subsection{Shortest Path}
 
-Find the shortest path between two nodes, if they are connected at all. E.g. to find out if Marc Rich (former founder of Glencore and always a bit in trouble with the law) still has connections to the Glencore group.
+The goal is to find the shortest path between two nodes, or if they are connected at all. In our example we want to find out if Marc Rich, the founder of Glencore who was later convicted for tax evasion and several other crimes, still has ties to the Glencore group.
 
-\includegraphics*[width=0.5\textwidth]{figures/query_shortest_path.png} \hfill
+\begin{center}
+
+\includegraphics*[width=0.5\textwidth]{figures/query-shortest-path-2.png}
+\end{center}
+
 
 \subsection{Subgraph Matching}
 
-We want to find two different officers for the same firm who live at the same address, e.g. to find family relations.
-This targets the subgraph matching [link?] aspect of graph databases.
+We want to find two different officers for the same company who live at the same address.
+Such queries can for example be used to find family relations.
+We use this query because it is designed to find specific patterns (subgraphs) within a whole graph.
 
-\includegraphics*[width=0.5\textwidth]{figures/query_relation.png} \hfill
+\begin{center}
+\includegraphics*[width=0.5\textwidth]{figures/query_relation.png}
+\end{center}
+
 
 
 % \subsection{Transitive Query}
@@ -189,7 +224,7 @@ For performance measurements, we repeat a sample queries a number of times and m
 The simple queries are repeated 100 times.
 The input for these queries varies each time with a different node to look for.
 The shortest path and subgraph matching was repeated only 10 times with fixed input.
-The measurement was done with Neo4J 4.4 and Postgres 14.3, each running in a Docker container.
+The measurement was done with Neo4J 4.4 and PostgreSQL 14.3, each running in a Docker container.
 The host system has an Intel Core i9-9900K CPU with 3.60GHz and 64GB RAM.
 
 %=====================================================================
@@ -219,10 +254,16 @@ The result of the query performance is shown in table \ref{table:performance}:
 	\end{center}
 \end{table}
 
-Generally, Cypher outperforms Postgres by a factor 3 to 7 in all but the simple point query.
+Generally Neo4J performs better than PostgreSQL by a factor 3 to 7 in all but the simple point query.
+This might be explained by the index-free adjacency that Neo4j internally uses for efficient graph traversal.
 
-There were also some problems in Shortest Path to make it even remotely usable, e.g. Postgres materializes the with query (https://www.postgresql.org/docs/current/queries-with.html). Any where clause therefore needs to be pushed into the recursive query.
-Another problem is that the intermediate result set gets too big if the distinct clause is not present (doubly calculated work).
+Most of the queries performed reasonably well with the first implementation in both Cypher and SQL, but the shortest path query required a few optimizations to get it to run below one minute. For example, Postgres always materializes a common table expression and does not push predicates into the CTE itself \cite{postgresMaterialize}.
+Therefore it is imperative that the \lstinline{where} clause which selects the start node is within the recursive common table expression itself, or else PostgreSQL will happily calculate the shortest path from every node to every other node at once.
+Another problem was that there can be multiple paths with the same length between two different nodes, and PostgreSQL would continue the search from both paths, leading to a lot of duplicate work. A \lstinline{select distinct on} operator can solve this problem however.
+
+Even with all these optimizations, Neo4j significantly outperforms PostgreSQL for shortest path calculations.
+One possible explanation is that the former can apply specialized algorithms like Djikstra \cite{TODO} which are not easily possible in plain SQL.
+Neo4j can also abort the query as soon as a viable solution has been found, whereas PostgreSQL will first evaluate its common table expression fully and only then select the shortest path.
 
 %---------------------------------------------------------------------
 \section{Ease of use} \label{sec:convenience}
@@ -230,19 +271,19 @@ Another problem is that the intermediate result set gets too big if the distinct
 
 Neo4j has a graph traversal operator $\rightarrow$ which can be used to search adjacent nodes.
 This is a very powerful tool, as every such graph traversal needs to be modeled as two joins in the relational model.
-The effect of this can be seen very nicely in the two-hop query, which requires four joins in Postgres:
+The effect of this can be seen very nicely in the two-hop query, which requires four joins in PostgreSQL:
 
 \lstinputlisting[language=SQL,label=two-hop-query]{pseudocode/two-hop.txt}
 
 Another very useful, although somewhat situational query mechanism is the shortest\_path funciton in Cypher.
 It can be used to find connections between two nodes very easily and efficiently.
-In Postgres we have to implement a kind of breadth-first search with a recursive common table expression and stop when the target node has been found.
+In PostgreSQL we have to implement a kind of breadth-first search with a recursive common table expression and stop when the target node has been found.
 
 \lstinputlisting[language=SQL,label=shortest-path-query]{pseudocode/shortest-path.txt}
 
 This example also shows how Cypher can easily ignore the directionality of edges
 if we do not specify the arrowhead in the $\rightarrow$ operator.
-To achieve the same behavior in Postgres we need to first calculate the union of the regular and reversed 'edge' table.
+To achieve the same behavior in PostgreSQL we need to first calculate the union of the regular and reversed 'edge' table.
 
 TODO: maybe measure complexity somehow (num characters, num operators)?
 
@@ -262,10 +303,7 @@ If there are many queries for subgraph matching or transitive graph traversal ar
 In this report we have analyzed three queries in neo4j and postgres and compared their execution performance and query complexity. 
 Due to the design of the study, the result favors neo4j, but it depends on the requirements if neo4j should be used.
 Note that this study does not try to answer the question if neo4j can be used instead of postgres, only if it can be used in addition to postgres. The former was never a goal.
-
-We believe this resolves all remaining questions on this topic. No further research is needed. [https://xkcd.com/2268/]
-
-
+We believe this resolves all remaining questions on this topic. No further research is needed \cite{xkcdresearch}.
 \bibliographystyle{alpha}
 \bibliography{references}
 \end{document}
