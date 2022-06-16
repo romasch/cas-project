@@ -205,16 +205,16 @@ The result of the query performance is shown in table \ref{table:performance}:
 	\begin{center}
 		\begin{tabular}{ |l|c|c|c| }
 			\hline
-			& queries & neo4j & postgres \\
+			& no. of queries & neo4j & postgres \\
 			\hline
-			Point Query & 100 & 0.043604s $\pm$ 0.021641s & 0.043645s $\pm$ 0.001029s \\
-			One-Hop & 100 & 0.038591s $\pm$ 0.015960s & 0.121463s $\pm$ 0.005704s \\
-			Two-Hop & 100 & 0.037369s $\pm$ 0.017822s & 0.275315s $\pm$ 0.007568s \\
-			Shortest Path & 10& 2.531583s $\pm$ 0.034940s & 16.413803s $\pm$ 0.238791s \\
-			Subgraph Matching & 10 & 5.521744s $\pm$ 0.155010s & 28.173800s $\pm$ 0.178777s \\
+			Point Query & 100 & 0.044 $\pm$ 0.023 & 0.044 $\pm$ 0.001 \\
+			One-Hop & 100 & 0.039 $\pm$ 0.016 & 0.121 $\pm$ 0.006 \\
+			Two-Hop & 100 & 0.037 $\pm$ 0.018 & 0.275 $\pm$ 0.008 \\
+			Shortest Path & 10 & 2.532 $\pm$ 0.035 & 16.414 $\pm$ 0.239 \\
+			Subgraph Matching & 10 & 5.522 $\pm$ 0.155 & 28.174 $\pm$ 0.179 \\
 			\hline
 		\end{tabular}
-		\caption{\label{table:performance} Meaurement results (average $\pm$ standard deviation).}
+		\caption{\label{table:performance} Query exeuction time in seconds (mean $\pm$ standard deviation).}
 	\end{center}
 \end{table}
 
