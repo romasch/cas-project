@@ -14,3 +14,5 @@ setup/neo4j-init/*.csv
 *.log
 *.toc
 *.synctex.gz
+*.bbl
+*.blg
