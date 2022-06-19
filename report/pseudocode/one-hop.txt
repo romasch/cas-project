@@ -1,7 +1,7 @@
 -- Cypher
-match (o:Officer)-->(a)
-  where o.name = 'Fishman - Marcos Shulim'
-return o, a;
+match (a:Officer)-->(b)
+  where a.name = 'Fishman - Marcos Shulim'
+return a, b;
 
 -- SQL
 select *
