@@ -28,3 +28,7 @@ select import.edge_start :: int,
        import.edge_type
 from offshoreleaks_import import
 where import.edge_start is not null;
+
+create index on edge(node_start);
+create index on edge(node_end);
+create index on node(name);
